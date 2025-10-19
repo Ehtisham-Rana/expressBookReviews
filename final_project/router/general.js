@@ -4,12 +4,19 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
+const getBooks = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+            resolve(books);
+        }, 1000);
+    });
+};
 
 public_users.post("/register", (req,res) => {
   let user = req.body.username;
   let password = req.body.password;
   if(user && password){
-    if((user)){
+    if(user){
         users.push({"username": user, "password": password});
         return res.status(201).json({message: "User created Successfully"});
     } else {
@@ -26,15 +33,18 @@ public_users.get('/',function (req, res) {
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
+public_users.get('/isbn/:isbn',async function (req, res) {
     const isbn = req.params.isbn;
-    res.send(books[isbn])
+    const bookList = await getBooks();
+    const book = bookList[isbn];
+    res.send(book)
  });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+public_users.get('/author/:author',async function (req, res) {
     const author = req.params.author;
-    const booksByAuthor = Object.values(books).filter(book => 
+    const bookList = await getBooks();
+    const booksByAuthor = Object.values(bookList).filter(book => 
         book.author.toLowerCase() === author.toLowerCase()
     );
     if (booksByAuthor.length > 0) {
@@ -47,9 +57,10 @@ public_users.get('/author/:author',function (req, res) {
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+public_users.get('/title/:title',async function (req, res) {
     const title = req.params.title;
-    const booksByTitle = Object.values(books).filter(book => 
+    const bookList = await getBooks();
+    const booksByTitle = Object.values(bookList).filter(book => 
         book.title.toLowerCase() === title.toLowerCase()
     );
     if (booksByTitle.length > 0) {

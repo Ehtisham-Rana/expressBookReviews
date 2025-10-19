@@ -44,11 +44,12 @@ regd_users.post("/login", (req,res) => {
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
   const isbn = req.params.isbn;
+  const user_id = req.session.userid;
   let book = books[isbn];
   if(book) {
-    let review = req.body.review;
-    if(review){
-        book.review = review;
+    let newReview = req.body.review;
+    if(newReview){
+        book.reviews[user_id] = review;
     }
     books[isbn]= book;
     res.send(`Book with the isbn ${isbn} updated.`);
